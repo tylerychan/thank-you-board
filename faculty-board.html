@@ -345,7 +345,7 @@ EMOJIS.forEach((e,i)=>{
   const el=document.createElement("span");
   el.className="emo";
   el.textContent=e;
-  el.onclick=()=>{if(emoji===e){emoji=null;el.classList.remove("active");}else{emoji=e;er.querySelectorAll(".emo").forEach(x=>x.classList.remove("active"));el.classList.add("active");}syncPreview();};
+  el.onclick=()=>{emoji=e;er.querySelectorAll(".emo").forEach(x=>x.classList.remove("active"));el.classList.add("active");syncPreview();};
   er.appendChild(el);
 });
 
