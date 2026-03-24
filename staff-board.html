@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Thank You, Obama Foundation Staff</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,700;0,9..144,900;1,9..144,400&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+
+<!--
+  ╔═══════════════════════════════════════════════════════╗
+  ║  PASTE YOUR THREE VALUES BELOW — nothing else to edit ║
+  ║  1. SUPABASE_URL  — supabase.com → Settings → API    ║
+  ║  2. SUPABASE_KEY  — anon/public key, same page        ║
+  ║  3. GIPHY_KEY     — developers.giphy.com (free)       ║
+  ╚═══════════════════════════════════════════════════════╝
+-->
+<script>
+const CONFIG = {
+  SUPABASE_URL:  "PASTE_YOUR_SUPABASE_URL_HERE",
+  SUPABASE_KEY:  "PASTE_YOUR_SUPABASE_ANON_KEY_HERE",
+  GIPHY_KEY:     "sZilHURcKXh9JkYLKUG8ZlnFCYeKltWf",
+  TABLE:         "staff_cards",
+  BOARD_LABEL:   "Obama Foundation Staff",
+  RECIPIENT:     "Obama Foundation Staff",
+  FROM_LINE:     "Cards from the 2025-2026 Leaders Asia-Pacific Cohort",
+};
+</script>
+
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --cobalt:#0047AB;--cobalt-d:#003080;--cobalt-l:#1a5fc4;
+  --cobalt-pale:#f0f4fb;--cobalt-mid:#e8eef8;
+  --gold:#C9A84C;--gold-l:#e8c96a;
+  --ink:#111827;--ink2:#374151;--muted:#6B7280;
+  --paper:#f9fafb;--white:#fff;
+  --border:#E5E7EB;--border2:#D1D5DB;
+  --radius:16px;
+  --shadow:0 2px 4px rgba(0,0,0,.05),0 8px 24px rgba(0,71,171,.07);
+  --shadow-h:0 8px 24px rgba(0,0,0,.1),0 24px 56px rgba(0,71,171,.14);
+}
+body{font-family:'DM Sans',system-ui,sans-serif;background:var(--paper);color:var(--ink);min-height:100vh;-webkit-font-smoothing:antialiased}
+
+/* ── HERO ── */
+.hero{position:relative;overflow:hidden;min-height:420px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:80px 24px 100px;background:linear-gradient(145deg,#001440 0%,#002370 40%,#003a9e 75%,#0047AB 100%)}
+.hero::before{content:'';position:absolute;inset:0;pointer-events:none;background-image:linear-gradient(rgba(255,255,255,.028) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.028) 1px,transparent 1px);background-size:44px 44px}
+.hero-glow{position:absolute;top:-80px;right:-80px;width:500px;height:500px;pointer-events:none;background:radial-gradient(circle,rgba(201,168,76,.16) 0%,transparent 68%)}
+.hero-glow2{position:absolute;bottom:-100px;left:-100px;width:440px;height:440px;pointer-events:none;background:radial-gradient(circle,rgba(26,95,196,.2) 0%,transparent 68%)}
+.hero-inner{position:relative;z-index:1;max-width:600px;animation:heroIn .85s cubic-bezier(.22,1,.36,1) both}
+@keyframes heroIn{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:translateY(0)}}
+.hero-eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:10.5px;font-weight:700;letter-spacing:2.8px;text-transform:uppercase;color:rgba(201,168,76,.8);margin-bottom:20px;border:1px solid rgba(201,168,76,.22);border-radius:40px;padding:5px 18px;background:rgba(201,168,76,.07)}
+.hero-board-tag{display:block;font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:10px}
+.hero-h1{font-family:'Fraunces',serif;font-size:clamp(38px,9vw,80px);font-weight:900;line-height:.93;letter-spacing:-2.5px;color:#fff;margin-bottom:20px}
+.hero-h1 em{font-style:italic;color:var(--gold-l);display:block}
+.hero-sub{font-size:15px;color:rgba(255,255,255,.45);line-height:1.7;margin-bottom:32px;font-style:italic}
+.hero-pill{display:inline-flex;align-items:center;gap:10px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);border-radius:40px;padding:10px 24px;font-size:13px;font-weight:600;color:rgba(255,255,255,.7);backdrop-filter:blur(8px)}
+.hero-pill-num{color:var(--gold-l);font-weight:700;font-size:15px}
+.hero-pill-dot{width:3px;height:3px;border-radius:50%;background:rgba(255,255,255,.3)}
+
+/* ── CONFETTI ── */
+.petals{position:fixed;inset:0;overflow:hidden;pointer-events:none;z-index:999}
+.petal{position:absolute;top:-16px;opacity:0;animation:fall linear both}
+@keyframes fall{0%{opacity:.9;transform:translateY(0) rotate(0deg)}100%{opacity:0;transform:translateY(105vh) rotate(520deg)}}
+
+/* ── FORM ── */
+.form-wrap{max-width:720px;margin:0 auto;padding:40px 20px 0}
+.form-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:28px 28px 24px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.form-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--cobalt),var(--gold))}
+.form-title{font-family:'Fraunces',serif;font-size:17px;font-weight:700;letter-spacing:-.2px;margin-bottom:20px;color:var(--ink);display:flex;align-items:center;gap:8px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+@media(max-width:540px){.form-row{grid-template-columns:1fr}}
+.form-group{display:flex;flex-direction:column;gap:5px;margin-bottom:14px}
+.form-group label{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted)}
+.form-group input,.form-group textarea{padding:9px 12px;border-radius:9px;border:1.5px solid var(--border2);font-family:'DM Sans',sans-serif;font-size:13px;background:var(--paper);color:var(--ink);transition:border-color .18s,background .15s;resize:none;width:100%}
+.form-group input:focus,.form-group textarea:focus{outline:none;border-color:var(--cobalt);background:var(--white)}
+.form-group input::placeholder,.form-group textarea::placeholder{color:var(--muted)}
+.swatches{display:flex;gap:7px;flex-wrap:wrap;padding:2px 0}
+.swatch{width:26px;height:26px;border-radius:7px;border:2.5px solid transparent;cursor:pointer;transition:transform .14s,border-color .14s;flex-shrink:0}
+.swatch:hover{transform:scale(1.18)}
+.swatch.active{border-color:var(--ink)!important;transform:scale(1.12)}
+.emoji-row{display:flex;gap:4px;flex-wrap:wrap}
+.emo{font-size:19px;padding:3px 5px;border-radius:7px;border:1.5px solid transparent;cursor:pointer;transition:background .1s,border-color .1s;line-height:1}
+.emo:hover{background:var(--paper)}
+.emo.active{border-color:var(--cobalt-mid);background:var(--cobalt-pale)}
+
+/* GIF */
+.gif-search-row{position:relative}
+.gif-search-row input{padding-right:76px;width:100%}
+.gif-btn{position:absolute;right:7px;top:50%;transform:translateY(-50%);background:var(--cobalt);color:#fff;border:none;border-radius:6px;padding:4px 12px;font-size:11px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:background .15s}
+.gif-btn:hover{background:var(--cobalt-d)}
+.gif-results{display:none;grid-template-columns:repeat(4,1fr);gap:5px;margin-top:8px;max-height:180px;overflow-y:auto;border-radius:9px}
+.gif-results img{width:100%;height:70px;object-fit:cover;border-radius:6px;cursor:pointer;border:2px solid transparent;transition:border-color .14s;display:block}
+.gif-results img:hover,.gif-results img.picked{border-color:var(--cobalt)}
+.gif-selected{position:relative;margin-top:8px;display:none}
+.gif-selected img{width:100%;border-radius:10px;max-height:160px;object-fit:cover;display:block}
+.gif-remove{position:absolute;top:6px;right:6px;background:rgba(0,0,0,.6);color:#fff;border:none;border-radius:50%;width:24px;height:24px;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s}
+.gif-remove:hover{background:rgba(0,0,0,.8)}
+.gif-status{font-size:11px;color:var(--muted);margin-top:6px;display:none}
+
+/* Preview */
+.preview-wrap{margin-bottom:18px}
+.preview-label{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);margin-bottom:8px}
+.preview-card{border-radius:12px;padding:16px;border:1px solid var(--border);background:var(--white);position:relative;overflow:hidden;transition:all .2s}
+.preview-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--pc-accent,var(--cobalt));border-radius:12px 12px 0 0}
+.preview-card::after{content:'';position:absolute;inset:0;pointer-events:none;background:linear-gradient(135deg,var(--pc-tint,var(--cobalt-pale)) 0%,transparent 55%);opacity:.5;border-radius:12px}
+.preview-card>*{position:relative;z-index:1}
+.pc-head{display:flex;align-items:center;gap:9px;margin-bottom:10px}
+.pc-avatar{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0;background:var(--pc-accent,var(--cobalt))}
+.pc-name{font-size:13px;font-weight:700}
+.pc-time{font-size:11px;color:var(--muted)}
+.pc-emoji{font-size:26px;margin-bottom:7px;line-height:1}
+.pc-msg{font-size:13px;line-height:1.7;color:var(--muted);font-style:italic}
+.pc-msg.has-text{font-style:normal;color:var(--ink2)}
+.pc-gif{margin-top:10px;border-radius:8px;overflow:hidden;display:none}
+.pc-gif img{width:100%;max-height:140px;object-fit:cover;display:block}
+
+/* Submit */
+.submit-btn{width:100%;padding:13px;border-radius:10px;border:none;background:var(--cobalt);color:#fff;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:700;cursor:pointer;letter-spacing:.2px;transition:background .15s,transform .1s;margin-top:4px}
+.submit-btn:hover{background:var(--cobalt-d)}
+.submit-btn:active{transform:scale(.98)}
+.submit-btn:disabled{opacity:.4;cursor:default}
+.submit-notice{text-align:center;font-size:12px;margin-top:8px;min-height:16px;font-weight:600}
+.submit-notice.ok{color:#15803d}
+.submit-notice.bad{color:#dc2626}
+
+/* ── EDIT MODAL ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:500;display:none;align-items:center;justify-content:center;padding:20px}
+.modal-overlay.open{display:flex}
+.modal{background:var(--white);border-radius:var(--radius);padding:28px;width:100%;max-width:480px;box-shadow:0 24px 60px rgba(0,0,0,.2);position:relative}
+.modal-title{font-family:'Fraunces',serif;font-size:17px;font-weight:700;margin-bottom:18px;color:var(--ink)}
+.modal textarea{width:100%;padding:10px 12px;border-radius:9px;border:1.5px solid var(--border2);font-family:'DM Sans',sans-serif;font-size:13px;background:var(--paper);color:var(--ink);resize:none;min-height:100px;transition:border-color .18s}
+.modal textarea:focus{outline:none;border-color:var(--cobalt);background:var(--white)}
+.modal-btns{display:flex;gap:10px;margin-top:16px}
+.modal-save{flex:1;padding:11px;border-radius:9px;border:none;background:var(--cobalt);color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:background .15s}
+.modal-save:hover{background:var(--cobalt-d)}
+.modal-cancel{padding:11px 18px;border-radius:9px;border:1.5px solid var(--border2);background:var(--white);color:var(--muted);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all .15s}
+.modal-cancel:hover{border-color:var(--border);color:var(--ink)}
+
+/* ── DIVIDER ── */
+.section-divider{display:flex;align-items:center;gap:14px;max-width:1160px;margin:40px auto 0;padding:0 20px}
+.section-divider span{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);white-space:nowrap}
+.section-divider::before,.section-divider::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* ── BOARD ── */
+.board-wrap{max-width:1160px;margin:0 auto;padding:24px 20px 80px;display:none}
+.featured{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:18px}
+.masonry{columns:3;column-gap:16px;margin-top:18px}
+@media(max-width:900px){.masonry{columns:2}}
+@media(max-width:540px){.masonry{columns:1}.featured{grid-template-columns:1fr}}
+
+/* ── CARD ── */
+.card{break-inside:avoid;background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:18px 18px 14px;margin-bottom:16px;box-shadow:var(--shadow);transition:box-shadow .22s,transform .18s;animation:cardIn .45s cubic-bezier(.22,1,.36,1) both;position:relative;overflow:hidden}
+.featured>.card{margin-bottom:0}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--c-accent,var(--cobalt));border-radius:var(--radius) var(--radius) 0 0}
+.card::after{content:'';position:absolute;inset:0;pointer-events:none;background:linear-gradient(140deg,var(--c-tint,var(--cobalt-pale)) 0%,transparent 55%);opacity:.55;border-radius:var(--radius)}
+.card>*{position:relative;z-index:1}
+.card:hover{box-shadow:var(--shadow-h);transform:translateY(-3px)}
+@keyframes cardIn{from{opacity:0;transform:translateY(16px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
+.card-head{display:flex;align-items:center;gap:9px;margin-bottom:11px}
+.card-avatar{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex-shrink:0;box-shadow:0 2px 6px rgba(0,0,0,.16)}
+.card-from{font-size:13px;font-weight:700;color:var(--ink)}
+.card-time{font-size:11px;color:var(--muted);margin-top:1px}
+.card-emoji{font-size:28px;margin-bottom:8px;line-height:1}
+.card-body{font-size:13.5px;line-height:1.72;color:var(--ink2);white-space:pre-wrap;word-break:break-word}
+.card-gif{margin-top:10px;border-radius:10px;overflow:hidden}
+.card-gif img{width:100%;display:block;max-height:200px;object-fit:cover}
+
+/* Card action buttons — only visible on own cards */
+.card-actions{display:flex;gap:6px;margin-top:12px}
+.card-btn{font-size:11px;font-weight:600;padding:4px 10px;border-radius:7px;border:1.5px solid var(--border2);background:transparent;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .14s;color:var(--muted)}
+.card-btn:hover{background:var(--paper)}
+.card-btn.edit:hover{border-color:var(--cobalt);color:var(--cobalt)}
+.card-btn.del:hover{border-color:#dc2626;color:#dc2626}
+
+/* Skeletons */
+.skel-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px;max-width:1160px;margin:40px auto 0;padding:0 20px}
+@media(max-width:680px){.skel-grid{grid-template-columns:1fr}}
+.skel{border-radius:var(--radius);background:linear-gradient(90deg,#eef1f6 25%,#e4e8ef 50%,#eef1f6 75%);background-size:200% 100%;animation:shimmer 1.4s infinite}
+@keyframes shimmer{to{background-position:-200% 0}}
+.empty-state{text-align:center;padding:60px 20px;color:var(--muted)}
+.empty-state .big{font-size:52px;margin-bottom:14px}
+.footer{text-align:center;padding:20px;border-top:1px solid var(--border);font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);display:flex;align-items:center;justify-content:center;gap:10px;margin-top:20px}
+.footer-dot{width:5px;height:5px;border-radius:50%;background:var(--cobalt);opacity:.35}
+</style>
+</head>
+<body>
+
+<div class="petals" id="petals"></div>
+
+<!-- EDIT MODAL -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <div class="modal-title">✏️ Edit your card</div>
+    <textarea id="modal-msg" rows="5" placeholder="Your message…"></textarea>
+    <div class="modal-btns">
+      <button class="modal-cancel" onclick="closeModal()">Cancel</button>
+      <button class="modal-save" onclick="saveEdit()">Save changes</button>
+    </div>
+  </div>
+</div>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-glow"></div>
+  <div class="hero-glow2"></div>
+  <div class="hero-inner">
+    <span class="hero-board-tag" id="hero-tag"></span>
+    <div class="hero-eyebrow">✦ &nbsp; A gift from your people &nbsp; ✦</div>
+    <h1 class="hero-h1">Thank<br/>you,<br/><em id="hero-name"></em></h1>
+    <p class="hero-sub" id="hero-sub"></p>
+    <div class="hero-pill">
+      <span class="hero-pill-num" id="hero-count">–</span>
+      <span class="hero-pill-dot"></span>
+      <span>cards written just for you</span>
+    </div>
+  </div>
+</div>
+
+<!-- FORM (hidden in recipient view) -->
+<div class="form-wrap" id="form-wrap">
+  <div class="form-card">
+    <div class="form-title">✍️ Leave your card</div>
+
+    <div class="preview-wrap">
+      <div class="preview-label">Preview</div>
+      <div class="preview-card" id="preview-card">
+        <div class="pc-head">
+          <div class="pc-avatar" id="pc-avatar">?</div>
+          <div><div class="pc-name" id="pc-name">Your name</div><div class="pc-time">just now</div></div>
+        </div>
+        <div class="pc-emoji" id="pc-emoji">🙏</div>
+        <div class="pc-msg" id="pc-msg">Your message will appear here…</div>
+        <div class="pc-gif" id="pc-gif"><img id="pc-gif-img" src="" alt=""/></div>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>Your name</label>
+        <input id="f-name" type="text" placeholder="How you'd like to sign it" oninput="syncPreview()"/>
+      </div>
+      <div class="form-group">
+        <label>Card color</label>
+        <div class="swatches" id="swatches"></div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Emoji</label>
+      <div class="emoji-row" id="emoji-row"></div>
+    </div>
+    <div class="form-group">
+      <label>Message</label>
+      <textarea id="f-msg" rows="4" placeholder="Write your thank you message…" oninput="syncPreview()"></textarea>
+    </div>
+    <div class="form-group">
+      <label>GIF (optional)</label>
+      <div class="gif-search-row">
+        <input id="gif-q" type="text" placeholder="Search for a GIF…" onkeydown="if(event.key==='Enter')searchGifs()"/>
+        <button class="gif-btn" onclick="searchGifs()">Search</button>
+      </div>
+      <div class="gif-status" id="gif-status"></div>
+      <div class="gif-results" id="gif-results"></div>
+      <div class="gif-selected" id="gif-selected">
+        <img id="gif-preview-img" src="" alt="Selected GIF"/>
+        <button class="gif-remove" onclick="clearGif()">✕</button>
+      </div>
+    </div>
+    <button class="submit-btn" id="submit-btn" onclick="submitCard()">Post My Card →</button>
+    <div class="submit-notice" id="submit-notice"></div>
+  </div>
+</div>
+
+<!-- BOARD -->
+<div class="section-divider" id="divider" style="display:none"><span>All cards</span></div>
+<div class="skel-grid" id="loading">
+  <div class="skel" style="height:180px"></div>
+  <div class="skel" style="height:150px"></div>
+  <div class="skel" style="height:210px"></div>
+</div>
+<div class="board-wrap" id="board-wrap">
+  <div class="featured" id="featured"></div>
+  <div class="masonry" id="masonry"></div>
+</div>
+<div class="empty-state" id="empty" style="display:none">
+  <div class="big">💌</div>
+  <p>No cards yet — be the first!</p>
+</div>
+<div class="footer"><span class="footer-dot"></span>Thank You Board<span class="footer-dot"></span></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+const sb = supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY);
+
+// ── Recipient view: hide form if ?view=recipient ──
+const IS_RECIPIENT = new URLSearchParams(window.location.search).get("view") === "recipient";
+if (IS_RECIPIENT) document.getElementById("form-wrap").style.display = "none";
+
+const ACCENTS=[
+  {hex:"#0047AB",tint:"#f0f4fb",av:"#0047AB"},{hex:"#1a5fc4",tint:"#eef3fc",av:"#1a5fc4"},
+  {hex:"#C9A84C",tint:"#fdf9ee",av:"#b8902a"},{hex:"#16a34a",tint:"#f0fdf4",av:"#16a34a"},
+  {hex:"#7c3aed",tint:"#faf5ff",av:"#7c3aed"},{hex:"#db2777",tint:"#fdf2f8",av:"#db2777"},
+  {hex:"#0891b2",tint:"#ecfeff",av:"#0891b2"},{hex:"#d97706",tint:"#fffbeb",av:"#d97706"},
+];
+const EMOJIS=["🙏","💙","🌟","🎉","🌸","✨","🔥","💫","🤗","🥹","💯","🌈","🫶","👏"];
+
+let accent=ACCENTS[0], emoji="🙏", gifUrl=null;
+let editingId=null;
+
+// ── My card IDs — stored in browser localStorage ──
+const STORAGE_KEY = "my_cards_" + CONFIG.TABLE;
+function getMyIds(){ try{ return JSON.parse(localStorage.getItem(STORAGE_KEY)||"[]"); }catch{ return []; } }
+function addMyId(id){ const ids=getMyIds(); if(!ids.includes(id)){ ids.push(id); localStorage.setItem(STORAGE_KEY,JSON.stringify(ids)); } }
+function isMyCard(id){ return getMyIds().includes(id); }
+
+const esc=s=>String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+const initials=n=>n.trim().split(/\s+/).map(w=>w[0]).join("").toUpperCase().slice(0,2)||"?";
+const timeAgo=ts=>{const d=(Date.now()-new Date(ts).getTime())/1000;if(d<60)return"just now";if(d<3600)return`${Math.floor(d/60)}m ago`;if(d<86400)return`${Math.floor(d/3600)}h ago`;if(d<604800)return`${Math.floor(d/86400)}d ago`;return new Date(ts).toLocaleDateString();};
+
+// ── Init ──
+document.getElementById("hero-name").textContent=CONFIG.RECIPIENT;
+document.getElementById("hero-sub").textContent=CONFIG.FROM_LINE;
+document.getElementById("hero-tag").textContent=CONFIG.BOARD_LABEL;
+
+// Build swatches
+const sw=document.getElementById("swatches");
+ACCENTS.forEach((a,i)=>{
+  const el=document.createElement("div");
+  el.className="swatch"+(i===0?" active":"");
+  el.style.background=a.hex;
+  el.onclick=()=>{accent=a;sw.querySelectorAll(".swatch").forEach(x=>x.classList.remove("active"));el.classList.add("active");syncPreview();};
+  sw.appendChild(el);
+});
+
+// Build emoji row
+const er=document.getElementById("emoji-row");
+EMOJIS.forEach((e,i)=>{
+  const el=document.createElement("span");
+  el.className="emo"+(i===0?" active":"");
+  el.textContent=e;
+  el.onclick=()=>{emoji=e;er.querySelectorAll(".emo").forEach(x=>x.classList.remove("active"));el.classList.add("active");syncPreview();};
+  er.appendChild(el);
+});
+
+// ── Live preview ──
+function syncPreview(){
+  const name=document.getElementById("f-name").value.trim();
+  const msg=document.getElementById("f-msg").value.trim();
+  const card=document.getElementById("preview-card");
+  card.style.setProperty("--pc-accent",accent.hex);
+  card.style.setProperty("--pc-tint",accent.tint);
+  const av=document.getElementById("pc-avatar");
+  av.textContent=name?initials(name):"?";
+  av.style.background=accent.av;
+  document.getElementById("pc-name").textContent=name||"Your name";
+  document.getElementById("pc-emoji").textContent=emoji;
+  const msgEl=document.getElementById("pc-msg");
+  if(msg){msgEl.textContent=msg;msgEl.classList.add("has-text");}
+  else{msgEl.textContent="Your message will appear here…";msgEl.classList.remove("has-text");}
+  const pcGif=document.getElementById("pc-gif");
+  if(gifUrl){document.getElementById("pc-gif-img").src=gifUrl;pcGif.style.display="block";}
+  else{pcGif.style.display="none";}
+}
+
+// ── GIF search ──
+async function searchGifs(){
+  const q=document.getElementById("gif-q").value.trim();if(!q)return;
+  const status=document.getElementById("gif-status");
+  const results=document.getElementById("gif-results");
+  status.textContent="Searching…";status.style.display="block";
+  results.style.display="none";results.innerHTML="";
+  if(!CONFIG.GIPHY_KEY||CONFIG.GIPHY_KEY==="PASTE_YOUR_GIPHY_API_KEY_HERE"){
+    status.textContent="Add your GIPHY API key in CONFIG to enable GIF search.";return;
+  }
+  try{
+    const res=await fetch(`https://api.giphy.com/v1/gifs/search?q=${encodeURIComponent(q)}&api_key=${CONFIG.GIPHY_KEY}&limit=8&rating=g`);
+    const data=await res.json();
+    status.style.display="none";
+    if(!data.data?.length){status.textContent="No results found.";status.style.display="block";return;}
+    results.style.display="grid";
+    data.data.forEach(r=>{
+      const thumb=r.images?.fixed_height_small?.url||r.images?.original?.url;
+      const full=r.images?.original?.url||thumb;if(!thumb)return;
+      const img=document.createElement("img");img.src=thumb;img.loading="lazy";
+      img.onclick=()=>{
+        results.querySelectorAll("img").forEach(i=>i.classList.remove("picked"));
+        img.classList.add("picked");gifUrl=full;
+        document.getElementById("gif-preview-img").src=thumb;
+        document.getElementById("gif-selected").style.display="block";
+        syncPreview();
+      };
+      results.appendChild(img);
+    });
+  }catch{status.textContent="GIF search failed — check your GIPHY key.";status.style.display="block";}
+}
+
+function clearGif(){
+  gifUrl=null;
+  document.getElementById("gif-selected").style.display="none";
+  document.getElementById("gif-preview-img").src="";
+  document.getElementById("gif-results").style.display="none";
+  document.getElementById("gif-results").innerHTML="";
+  document.getElementById("gif-q").value="";
+  document.getElementById("gif-status").style.display="none";
+  syncPreview();
+}
+
+// ── Submit ──
+async function submitCard(){
+  const from=document.getElementById("f-name").value.trim();
+  const msg=document.getElementById("f-msg").value.trim();
+  const notice=document.getElementById("submit-notice");
+  if(!from||!msg){notice.className="submit-notice bad";notice.textContent="⚠ Please fill in your name and message.";setTimeout(()=>notice.textContent="",3000);return;}
+  const btn=document.getElementById("submit-btn");
+  btn.disabled=true;btn.textContent="Posting…";
+  const{data,error}=await sb.from(CONFIG.TABLE).insert({
+    name:from,message:msg,emoji,accent_idx:ACCENTS.indexOf(accent),gif_url:gifUrl||null,
+  }).select("id").single();
+  if(error){
+    notice.className="submit-notice bad";notice.textContent="⚠ Could not save — check your Supabase URL and key.";
+    console.error(error);btn.disabled=false;btn.textContent="Post My Card →";return;
+  }
+  // Remember this card as ours
+  if(data?.id) addMyId(data.id);
+  notice.className="submit-notice ok";notice.textContent="✓ Your card is on the board!";
+  document.getElementById("f-name").value="";
+  document.getElementById("f-msg").value="";
+  clearGif();emoji="🙏";
+  er.querySelectorAll(".emo").forEach((b,i)=>b.classList.toggle("active",i===0));
+  syncPreview();
+  setTimeout(()=>notice.textContent="",5000);
+  btn.disabled=false;btn.textContent="Post My Card →";
+  loadBoard();
+}
+
+// ── Edit modal ──
+function openModal(id, currentMsg){
+  editingId=id;
+  document.getElementById("modal-msg").value=currentMsg;
+  document.getElementById("modal").classList.add("open");
+  document.getElementById("modal-msg").focus();
+}
+function closeModal(){
+  editingId=null;
+  document.getElementById("modal").classList.remove("open");
+}
+async function saveEdit(){
+  const msg=document.getElementById("modal-msg").value.trim();
+  if(!msg)return;
+  const{error}=await sb.from(CONFIG.TABLE).update({message:msg}).eq("id",editingId);
+  if(error){console.error(error);alert("Could not save — please try again.");return;}
+  closeModal();
+  loadBoard();
+}
+// Close modal on overlay click
+document.getElementById("modal").addEventListener("click",e=>{if(e.target===document.getElementById("modal"))closeModal();});
+
+// ── Delete ──
+async function deleteCard(id){
+  if(!confirm("Delete your card? This cannot be undone."))return;
+  const{error}=await sb.from(CONFIG.TABLE).delete().eq("id",id);
+  if(error){console.error(error);alert("Could not delete — please try again.");return;}
+  loadBoard();
+}
+
+// ── Load board ──
+async function loadBoard(){
+  const{data,error}=await sb.from(CONFIG.TABLE).select("*").order("created_at",{ascending:false});
+  document.getElementById("loading").style.display="none";
+  if(error||!data||!data.length){
+    document.getElementById("empty").style.display="block";
+    document.getElementById("hero-count").textContent="0";
+    return;
+  }
+  document.getElementById("hero-count").textContent=data.length;
+  document.getElementById("divider").style.display="flex";
+  document.getElementById("empty").style.display="none";
+  document.getElementById("board-wrap").style.display="block";
+  const feat=data.slice(0,Math.min(3,data.length));
+  const rest=data.slice(Math.min(3,data.length));
+  document.getElementById("featured").innerHTML=feat.map((c,i)=>cardHtml(c,i*0.08)).join("");
+  document.getElementById("masonry").innerHTML=rest.map((c,i)=>cardHtml(c,0.25+i*0.04)).join("");
+}
+
+function cardHtml(c,delay=0){
+  const a=ACCENTS[c.accent_idx]||ACCENTS[0];
+  const mine=!IS_RECIPIENT&&isMyCard(c.id);
+  const actions=mine?`<div class="card-actions">
+    <button class="card-btn edit" onclick="openModal('${c.id}',${JSON.stringify(c.message)})">✏️ Edit</button>
+    <button class="card-btn del" onclick="deleteCard('${c.id}')">🗑 Delete</button>
+  </div>`:"";
+  return`<div class="card" style="--c-accent:${a.hex};--c-tint:${a.tint};animation-delay:${delay}s">
+  <div class="card-head">
+    <div class="card-avatar" style="background:${a.av}">${initials(c.name)}</div>
+    <div><div class="card-from">${esc(c.name)}</div><div class="card-time">${timeAgo(c.created_at)}</div></div>
+  </div>
+  <div class="card-emoji">${c.emoji||"🙏"}</div>
+  <div class="card-body">${esc(c.message)}</div>
+  ${c.gif_url?`<div class="card-gif"><img src="${esc(c.gif_url)}" alt="GIF" loading="lazy"/></div>`:""}
+  ${actions}
+</div>`;
+}
+
+// ── Confetti ──
+function launchPetals(){
+  const wrap=document.getElementById("petals");
+  const colors=["#0047AB","#1a5fc4","#C9A84C","#e8c96a","#fff","#93c5fd","#fbbf24","#86efac"];
+  for(let i=0;i<55;i++){
+    const el=document.createElement("div");el.className="petal";
+    const sz=5+Math.random()*10;
+    el.style.cssText=`left:${Math.random()*100}%;width:${sz}px;height:${sz}px;background:${colors[Math.floor(Math.random()*colors.length)]};animation-duration:${2.5+Math.random()*4}s;animation-delay:${Math.random()*2}s;border-radius:${Math.random()>.5?"50% 0 50% 0":"50%"}`;
+    wrap.appendChild(el);
+  }
+  setTimeout(()=>wrap.innerHTML="",7500);
+}
+
+// ── Real-time ──
+sb.channel("cards-"+CONFIG.TABLE)
+  .on("postgres_changes",{event:"*",schema:"public",table:CONFIG.TABLE},()=>loadBoard())
+  .subscribe();
+
+// ── Start ──
+loadBoard().then(()=>{if(document.getElementById("hero-count").textContent!=="0")launchPetals();});
+</script>
+</body>
+</html>
