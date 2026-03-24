@@ -229,7 +229,7 @@ body{font-family:'DM Sans',system-ui,sans-serif;background:var(--paper);color:va
           <div class="pc-avatar" id="pc-avatar">?</div>
           <div><div class="pc-name" id="pc-name">Your name</div><div class="pc-time">just now</div></div>
         </div>
-        <div class="pc-emoji" id="pc-emoji">🙏</div>
+        <div class="pc-emoji" id="pc-emoji" style="display:none"></div>
         <div class="pc-msg" id="pc-msg">Your message will appear here…</div>
         <div class="pc-gif" id="pc-gif"><img id="pc-gif-img" src="" alt=""/></div>
       </div>
@@ -246,7 +246,7 @@ body{font-family:'DM Sans',system-ui,sans-serif;background:var(--paper);color:va
       </div>
     </div>
     <div class="form-group">
-      <label>Emoji</label>
+      <label>Emoji (optional)</label>
       <div class="emoji-row" id="emoji-row"></div>
     </div>
     <div class="form-group">
@@ -304,7 +304,7 @@ const ACCENTS=[
 ];
 const EMOJIS=["🙏","💙","🌟","🎉","🌸","✨","🔥","💫","🤗","🥹","💯","🌈","🫶","👏"];
 
-let accent=ACCENTS[0], emoji="🙏", gifUrl=null;
+let accent=ACCENTS[0], emoji=null, gifUrl=null;
 let editingId=null;
 
 // ── My card IDs — stored in browser localStorage ──
@@ -336,9 +336,9 @@ ACCENTS.forEach((a,i)=>{
 const er=document.getElementById("emoji-row");
 EMOJIS.forEach((e,i)=>{
   const el=document.createElement("span");
-  el.className="emo"+(i===0?" active":"");
+  el.className="emo";
   el.textContent=e;
-  el.onclick=()=>{emoji=e;er.querySelectorAll(".emo").forEach(x=>x.classList.remove("active"));el.classList.add("active");syncPreview();};
+  el.onclick=()=>{if(emoji===e){emoji=null;el.classList.remove("active");}else{emoji=e;er.querySelectorAll(".emo").forEach(x=>x.classList.remove("active"));el.classList.add("active");}syncPreview();};
   er.appendChild(el);
 });
 
@@ -353,7 +353,9 @@ function syncPreview(){
   av.textContent=name?initials(name):"?";
   av.style.background=accent.av;
   document.getElementById("pc-name").textContent=name||"Your name";
-  document.getElementById("pc-emoji").textContent=emoji;
+  const pcEmoji=document.getElementById("pc-emoji");
+  if(emoji){pcEmoji.textContent=emoji;pcEmoji.style.display="block";}
+  else{pcEmoji.textContent="";pcEmoji.style.display="none";}
   const msgEl=document.getElementById("pc-msg");
   if(msg){msgEl.textContent=msg;msgEl.classList.add("has-text");}
   else{msgEl.textContent="Your message will appear here…";msgEl.classList.remove("has-text");}
@@ -414,7 +416,7 @@ async function submitCard(){
   const btn=document.getElementById("submit-btn");
   btn.disabled=true;btn.textContent="Posting…";
   const{data,error}=await sb.from(CONFIG.TABLE).insert({
-    name:from,message:msg,emoji,accent_idx:ACCENTS.indexOf(accent),gif_url:gifUrl||null,
+    name:from,message:msg,emoji:emoji||null,accent_idx:ACCENTS.indexOf(accent),gif_url:gifUrl||null,
   }).select("id").single();
   if(error){
     notice.className="submit-notice bad";notice.textContent="⚠ Could not save — check your Supabase URL and key.";
@@ -425,8 +427,8 @@ async function submitCard(){
   notice.className="submit-notice ok";notice.textContent="✓ Your card is on the board!";
   document.getElementById("f-name").value="";
   document.getElementById("f-msg").value="";
-  clearGif();emoji="🙏";
-  er.querySelectorAll(".emo").forEach((b,i)=>b.classList.toggle("active",i===0));
+  clearGif();emoji=null;
+  er.querySelectorAll(".emo").forEach(b=>b.classList.remove("active"));
   syncPreview();
   setTimeout(()=>notice.textContent="",5000);
   btn.disabled=false;btn.textContent="Post My Card →";
@@ -494,7 +496,7 @@ function cardHtml(c,delay=0){
     <div class="card-avatar" style="background:${a.av}">${initials(c.name)}</div>
     <div><div class="card-from">${esc(c.name)}</div><div class="card-time">${timeAgo(c.created_at)}</div></div>
   </div>
-  <div class="card-emoji">${c.emoji||"🙏"}</div>
+  ${c.emoji?`<div class="card-emoji">${c.emoji}</div>`:""}
   <div class="card-body">${esc(c.message)}</div>
   ${c.gif_url?`<div class="card-gif"><img src="${esc(c.gif_url)}" alt="GIF" loading="lazy"/></div>`:""}
   ${actions}
