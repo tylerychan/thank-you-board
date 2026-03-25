@@ -136,7 +136,7 @@ emoji-picker{--emoji-size:1.4rem;--background:var(--white);--border-color:var(--
 /* ── EDIT MODAL ── */
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:500;display:none;align-items:center;justify-content:center;padding:20px}
 .modal-overlay.open{display:flex}
-.modal{background:var(--white);border-radius:var(--radius);padding:28px;width:100%;max-width:480px;box-shadow:0 24px 60px rgba(0,0,0,.2);position:relative}
+.modal{background:var(--white);border-radius:var(--radius);padding:28px;width:100%;max-width:560px;max-height:90vh;overflow-y:auto;box-shadow:0 24px 60px rgba(0,0,0,.2);position:relative}
 .modal-title{font-family:'Fraunces',serif;font-size:17px;font-weight:700;margin-bottom:18px;color:var(--ink)}
 .modal textarea{width:100%;padding:10px 12px;border-radius:9px;border:1.5px solid var(--border2);font-family:'DM Sans',sans-serif;font-size:13px;background:var(--paper);color:var(--ink);resize:none;min-height:100px;transition:border-color .18s}
 .modal textarea:focus{outline:none;border-color:var(--cobalt);background:var(--white)}
@@ -201,7 +201,32 @@ emoji-picker{--emoji-size:1.4rem;--background:var(--white);--border-color:var(--
 <div class="modal-overlay" id="modal">
   <div class="modal">
     <div class="modal-title">✏️ Edit your card</div>
-    <textarea id="modal-msg" rows="5" placeholder="Your message…"></textarea>
+    <div class="form-group" style="margin-bottom:14px">
+      <label>Emoji (optional)</label>
+      <div class="emoji-selected-row">
+        <button type="button" class="emoji-toggle" id="modal-emoji-toggle">
+          <span id="modal-emoji-label">No emoji</span>
+        </button>
+        <button type="button" class="emoji-none-btn active" id="modal-emoji-none">✕</button>
+      </div>
+      <div class="emoji-picker-container" id="modal-emoji-picker-container" style="display:none">
+        <emoji-picker class="light" id="modal-emoji-picker"></emoji-picker>
+      </div>
+    </div>
+    <textarea id="modal-msg" rows="4" placeholder="Your message…"></textarea>
+    <div class="form-group" style="margin-top:14px">
+      <label>GIF (optional)</label>
+      <div class="gif-search-row">
+        <input id="modal-gif-q" type="text" placeholder="Search for a GIF…" onkeydown="if(event.key==='Enter')modalSearchGifs()"/>
+        <button class="gif-btn" onclick="modalSearchGifs()">Search</button>
+      </div>
+      <div class="gif-status" id="modal-gif-status"></div>
+      <div class="gif-results" id="modal-gif-results"></div>
+      <div class="gif-selected" id="modal-gif-selected">
+        <img id="modal-gif-preview-img" src="" alt="Selected GIF"/>
+        <button class="gif-remove" onclick="modalClearGif()">✕</button>
+      </div>
+    </div>
     <div class="modal-btns">
       <button class="modal-cancel" onclick="closeModal()">Cancel</button>
       <button class="modal-save" onclick="saveEdit()">Save changes</button>
@@ -323,7 +348,8 @@ const ACCENTS=[
 ];
 
 let accent=ACCENTS[0], emoji=null, gifUrl=null;
-let editingId=null;
+let editingId=null, editEmoji=null, editGifUrl=null;
+let cardsById={};
 
 // ── My card IDs — stored in browser localStorage ──
 const STORAGE_KEY = "my_cards_" + CONFIG.TABLE;
@@ -471,20 +497,98 @@ async function submitCard(){
 }
 
 // ── Edit modal ──
-function openModal(id, currentMsg){
+const modalEmojiToggle=document.getElementById("modal-emoji-toggle");
+const modalEmojiLabel=document.getElementById("modal-emoji-label");
+const modalEmojiContainer=document.getElementById("modal-emoji-picker-container");
+const modalEmojiPicker=document.getElementById("modal-emoji-picker");
+const modalEmojiNone=document.getElementById("modal-emoji-none");
+
+modalEmojiToggle.addEventListener("click",()=>{
+  modalEmojiContainer.style.display=modalEmojiContainer.style.display!=="none"?"none":"block";
+});
+modalEmojiPicker.addEventListener("emoji-click",(e)=>{
+  editEmoji=e.detail.unicode;
+  modalEmojiLabel.innerHTML='<span class="chosen-emoji">'+editEmoji+'</span> Change emoji';
+  modalEmojiNone.classList.remove("active");
+  modalEmojiContainer.style.display="none";
+});
+modalEmojiNone.addEventListener("click",()=>{
+  editEmoji=null;
+  modalEmojiLabel.textContent="No emoji";
+  modalEmojiNone.classList.add("active");
+});
+
+async function modalSearchGifs(){
+  const q=document.getElementById("modal-gif-q").value.trim();if(!q)return;
+  const status=document.getElementById("modal-gif-status");
+  const results=document.getElementById("modal-gif-results");
+  status.textContent="Searching…";status.style.display="block";
+  results.style.display="none";results.innerHTML="";
+  try{
+    const res=await fetch(`https://api.giphy.com/v1/gifs/search?q=${encodeURIComponent(q)}&api_key=${CONFIG.GIPHY_KEY}&limit=50&rating=g`);
+    const data=await res.json();
+    status.style.display="none";
+    if(!data.data?.length){status.textContent="No results found.";status.style.display="block";return;}
+    results.style.display="grid";
+    data.data.forEach(r=>{
+      const thumb=r.images?.fixed_height_small?.url||r.images?.original?.url;
+      const full=r.images?.original?.url||thumb;if(!thumb)return;
+      const img=document.createElement("img");img.src=thumb;img.loading="lazy";
+      img.onclick=()=>{
+        results.querySelectorAll("img").forEach(i=>i.classList.remove("picked"));
+        img.classList.add("picked");editGifUrl=full;
+        document.getElementById("modal-gif-preview-img").src=thumb;
+        document.getElementById("modal-gif-selected").style.display="block";
+      };
+      results.appendChild(img);
+    });
+  }catch{status.textContent="GIF search failed.";status.style.display="block";}
+}
+function modalClearGif(){
+  editGifUrl=null;
+  document.getElementById("modal-gif-selected").style.display="none";
+  document.getElementById("modal-gif-preview-img").src="";
+  document.getElementById("modal-gif-results").style.display="none";
+  document.getElementById("modal-gif-results").innerHTML="";
+  document.getElementById("modal-gif-q").value="";
+  document.getElementById("modal-gif-status").style.display="none";
+}
+
+function openModal(id){
   editingId=id;
-  document.getElementById("modal-msg").value=currentMsg;
+  const c=cardsById[id];
+  document.getElementById("modal-msg").value=c.message;
+  editEmoji=c.emoji||null;
+  if(editEmoji){
+    modalEmojiLabel.innerHTML='<span class="chosen-emoji">'+editEmoji+'</span> Change emoji';
+    modalEmojiNone.classList.remove("active");
+  }else{
+    modalEmojiLabel.textContent="No emoji";
+    modalEmojiNone.classList.add("active");
+  }
+  modalEmojiContainer.style.display="none";
+  editGifUrl=c.gif_url||null;
+  modalClearGif();
+  if(editGifUrl){
+    document.getElementById("modal-gif-preview-img").src=editGifUrl;
+    document.getElementById("modal-gif-selected").style.display="block";
+    editGifUrl=c.gif_url;
+  }
   document.getElementById("modal").classList.add("open");
-  document.getElementById("modal-msg").focus();
 }
 function closeModal(){
   editingId=null;
+  editEmoji=null;editGifUrl=null;
+  modalEmojiLabel.textContent="No emoji";
+  modalEmojiNone.classList.add("active");
+  modalEmojiContainer.style.display="none";
+  modalClearGif();
   document.getElementById("modal").classList.remove("open");
 }
 async function saveEdit(){
   const msg=document.getElementById("modal-msg").value.trim();
   if(!msg)return;
-  const{error}=await sb.from(CONFIG.TABLE).update({message:msg}).eq("id",editingId);
+  const{error}=await sb.from(CONFIG.TABLE).update({message:msg,emoji:editEmoji||null,gif_url:editGifUrl||null}).eq("id",editingId);
   if(error){console.error(error);alert("Could not save — please try again.");return;}
   closeModal();
   loadBoard();
@@ -509,6 +613,7 @@ async function loadBoard(){
     document.getElementById("hero-count").textContent="0";
     return;
   }
+  cardsById={};data.forEach(c=>cardsById[c.id]=c);
   document.getElementById("hero-count").textContent=data.length;
   document.getElementById("divider").style.display="flex";
   document.getElementById("empty").style.display="none";
@@ -523,7 +628,7 @@ function cardHtml(c,delay=0){
   const a=ACCENTS[c.accent_idx]||ACCENTS[0];
   const mine=!IS_RECIPIENT&&isMyCard(c.id);
   const actions=mine?`<div class="card-actions">
-    <button class="card-btn edit" onclick="openModal('${c.id}',${JSON.stringify(c.message).replace(/&/g,'&amp;').replace(/"/g,'&quot;')})">✏️ Edit</button>
+    <button class="card-btn edit" onclick="openModal('${c.id}')">✏️ Edit</button>
     <button class="card-btn del" onclick="deleteCard('${c.id}')">🗑 Delete</button>
   </div>`:"";
   return`<div class="card" style="--c-accent:${a.hex};--c-tint:${a.tint};animation-delay:${delay}s">
