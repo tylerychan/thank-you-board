@@ -25,6 +25,7 @@ const CONFIG = {
   BOARD_LABEL:   "Core Faculty",
   RECIPIENT:     "Core Faculty",
   FROM_LINE:     "Cards from the 2025-2026 Leaders Asia-Pacific Cohort",
+  STORAGE_BUCKET: "card-photos",
 };
 </script>
 
@@ -107,6 +108,15 @@ emoji-picker{--emoji-size:1.4rem;--background:var(--white);--border-color:var(--
 .gif-remove:hover{background:rgba(0,0,0,.8)}
 .gif-status{font-size:11px;color:var(--muted);margin-top:6px;display:none}
 
+/* Photo upload */
+.photo-upload-btn{display:flex;align-items:center;gap:8px;padding:7px 14px;border-radius:9px;border:1.5px solid var(--border2);background:var(--paper);font-family:'DM Sans',sans-serif;font-size:13px;color:var(--ink);cursor:pointer;transition:border-color .18s,background .15s}
+.photo-upload-btn:hover{border-color:var(--cobalt);background:var(--white)}
+.photo-selected{position:relative;margin-top:8px;display:none}
+.photo-selected img{width:100%;border-radius:10px;max-height:200px;object-fit:cover;display:block}
+.photo-remove{position:absolute;top:6px;right:6px;background:rgba(0,0,0,.6);color:#fff;border:none;border-radius:50%;width:24px;height:24px;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s}
+.photo-remove:hover{background:rgba(0,0,0,.8)}
+.photo-status{font-size:11px;color:var(--muted);margin-top:6px;display:none}
+
 /* Preview */
 .preview-wrap{margin-bottom:18px}
 .preview-label{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);margin-bottom:8px}
@@ -123,6 +133,8 @@ emoji-picker{--emoji-size:1.4rem;--background:var(--white);--border-color:var(--
 .pc-msg.has-text{font-style:normal;color:var(--ink2)}
 .pc-gif{margin-top:10px;border-radius:8px;overflow:hidden;display:none}
 .pc-gif img{width:100%;max-height:140px;object-fit:cover;display:block}
+.pc-photo{margin-top:10px;border-radius:8px;overflow:hidden;display:none}
+.pc-photo img{width:100%;max-height:140px;object-fit:cover;display:block}
 
 /* Submit */
 .submit-btn{width:100%;padding:13px;border-radius:10px;border:none;background:var(--cobalt);color:#fff;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:700;cursor:pointer;letter-spacing:.2px;transition:background .15s,transform .1s;margin-top:4px}
@@ -174,6 +186,8 @@ emoji-picker{--emoji-size:1.4rem;--background:var(--white);--border-color:var(--
 .card-body{font-size:13.5px;line-height:1.72;color:var(--ink2);white-space:pre-wrap;word-break:break-word}
 .card-gif{margin-top:10px;border-radius:10px;overflow:hidden}
 .card-gif img{width:100%;display:block;max-height:200px;object-fit:cover}
+.card-photo{margin-top:10px;border-radius:10px;overflow:hidden}
+.card-photo img{width:100%;display:block;max-height:200px;object-fit:cover}
 
 /* Card action buttons — only visible on own cards */
 .card-actions{display:flex;gap:6px;margin-top:12px}
@@ -227,6 +241,16 @@ emoji-picker{--emoji-size:1.4rem;--background:var(--white);--border-color:var(--
         <button class="gif-remove" onclick="modalClearGif()">✕</button>
       </div>
     </div>
+    <div class="form-group" style="margin-top:14px">
+      <label>Photo (optional)</label>
+      <input type="file" id="modal-photo-input" accept="image/jpeg,image/png" style="display:none" onchange="handleModalPhotoSelect(this)"/>
+      <button type="button" class="photo-upload-btn" onclick="document.getElementById('modal-photo-input').click()">📷 Choose a photo</button>
+      <div class="photo-status" id="modal-photo-status"></div>
+      <div class="photo-selected" id="modal-photo-selected">
+        <img id="modal-photo-preview-img" src="" alt="Selected photo"/>
+        <button class="photo-remove" onclick="modalClearPhoto()">✕</button>
+      </div>
+    </div>
     <div class="modal-btns">
       <button class="modal-cancel" onclick="closeModal()">Cancel</button>
       <button class="modal-save" onclick="saveEdit()">Save changes</button>
@@ -266,6 +290,7 @@ emoji-picker{--emoji-size:1.4rem;--background:var(--white);--border-color:var(--
         <div class="pc-emoji" id="pc-emoji" style="display:none"></div>
         <div class="pc-msg" id="pc-msg">Your message will appear here…</div>
         <div class="pc-gif" id="pc-gif"><img id="pc-gif-img" src="" alt=""/></div>
+        <div class="pc-photo" id="pc-photo"><img id="pc-photo-img" src="" alt=""/></div>
       </div>
     </div>
 
@@ -310,6 +335,16 @@ emoji-picker{--emoji-size:1.4rem;--background:var(--white);--border-color:var(--
         <button class="gif-remove" onclick="clearGif()">✕</button>
       </div>
     </div>
+    <div class="form-group">
+      <label>Photo (optional)</label>
+      <input type="file" id="photo-input" accept="image/jpeg,image/png" style="display:none" onchange="handlePhotoSelect(this)"/>
+      <button type="button" class="photo-upload-btn" onclick="document.getElementById('photo-input').click()">📷 Choose a photo</button>
+      <div class="photo-status" id="photo-status"></div>
+      <div class="photo-selected" id="photo-selected">
+        <img id="photo-preview-img" src="" alt="Selected photo"/>
+        <button class="photo-remove" onclick="clearPhoto()">✕</button>
+      </div>
+    </div>
     <button class="submit-btn" id="submit-btn" onclick="submitCard()">Post My Card →</button>
     <div class="submit-notice" id="submit-notice"></div>
   </div>
@@ -347,8 +382,8 @@ const ACCENTS=[
   {hex:"#0891b2",tint:"#ecfeff",av:"#0891b2"},{hex:"#d97706",tint:"#fffbeb",av:"#d97706"},
 ];
 
-let accent=ACCENTS[0], emoji=null, gifUrl=null;
-let editingId=null, editEmoji=null, editGifUrl=null;
+let accent=ACCENTS[0], emoji=null, gifUrl=null, photoFile=null, photoPreviewUrl=null;
+let editingId=null, editEmoji=null, editGifUrl=null, editPhotoFile=null, editPhotoUrl=null;
 let cardsById={};
 
 // ── My card IDs — stored in browser localStorage ──
@@ -421,6 +456,61 @@ function syncPreview(){
   const pcGif=document.getElementById("pc-gif");
   if(gifUrl){document.getElementById("pc-gif-img").src=gifUrl;pcGif.style.display="block";}
   else{pcGif.style.display="none";}
+  const pcPhoto=document.getElementById("pc-photo");
+  if(photoPreviewUrl){document.getElementById("pc-photo-img").src=photoPreviewUrl;pcPhoto.style.display="block";}
+  else{pcPhoto.style.display="none";}
+}
+
+// ── Photo upload ──
+function compressImage(file){
+  return new Promise((resolve)=>{
+    const img=new Image();
+    img.onload=()=>{
+      const canvas=document.createElement("canvas");
+      const MAX=800;
+      let w=img.width,h=img.height;
+      if(w>MAX){h=Math.round(h*(MAX/w));w=MAX;}
+      canvas.width=w;canvas.height=h;
+      canvas.getContext("2d").drawImage(img,0,0,w,h);
+      canvas.toBlob(resolve,"image/jpeg",0.8);
+    };
+    img.src=URL.createObjectURL(file);
+  });
+}
+
+function handlePhotoSelect(input){
+  const file=input.files[0];if(!file)return;
+  if(!["image/jpeg","image/png"].includes(file.type)){
+    const s=document.getElementById("photo-status");s.textContent="Please select a JPEG or PNG file.";s.style.display="block";return;
+  }
+  if(file.size>10*1024*1024){
+    const s=document.getElementById("photo-status");s.textContent="File too large (max 10 MB).";s.style.display="block";return;
+  }
+  document.getElementById("photo-status").style.display="none";
+  compressImage(file).then(blob=>{
+    photoFile=blob;
+    photoPreviewUrl=URL.createObjectURL(blob);
+    document.getElementById("photo-preview-img").src=photoPreviewUrl;
+    document.getElementById("photo-selected").style.display="block";
+    syncPreview();
+  });
+}
+
+function clearPhoto(){
+  photoFile=null;photoPreviewUrl=null;
+  document.getElementById("photo-selected").style.display="none";
+  document.getElementById("photo-preview-img").src="";
+  document.getElementById("photo-input").value="";
+  document.getElementById("photo-status").style.display="none";
+  syncPreview();
+}
+
+async function uploadPhoto(blob){
+  const path=CONFIG.TABLE+"/"+Date.now()+"_"+Math.random().toString(36).slice(2,8)+".jpg";
+  const{error}=await sb.storage.from(CONFIG.STORAGE_BUCKET).upload(path,blob,{contentType:"image/jpeg"});
+  if(error){console.error(error);return null;}
+  const{data}=sb.storage.from(CONFIG.STORAGE_BUCKET).getPublicUrl(path);
+  return data.publicUrl;
 }
 
 // ── GIF search ──
@@ -474,8 +564,10 @@ async function submitCard(){
   if(!from||!msg){notice.className="submit-notice bad";notice.textContent="⚠ Please fill in your name and message.";setTimeout(()=>notice.textContent="",3000);return;}
   const btn=document.getElementById("submit-btn");
   btn.disabled=true;btn.textContent="Posting…";
+  let photoUrl=null;
+  if(photoFile){photoUrl=await uploadPhoto(photoFile);if(!photoUrl){notice.className="submit-notice bad";notice.textContent="⚠ Photo upload failed.";btn.disabled=false;btn.textContent="Post My Card →";return;}}
   const{data,error}=await sb.from(CONFIG.TABLE).insert({
-    name:from,message:msg,emoji:emoji||null,accent_idx:ACCENTS.indexOf(accent),gif_url:gifUrl||null,
+    name:from,message:msg,emoji:emoji||null,accent_idx:ACCENTS.indexOf(accent),gif_url:gifUrl||null,photo_url:photoUrl||null,
   }).select("id").single();
   if(error){
     notice.className="submit-notice bad";notice.textContent="⚠ Could not save — check your Supabase URL and key.";
@@ -486,7 +578,7 @@ async function submitCard(){
   notice.className="submit-notice ok";notice.textContent="✓ Your card is on the board!";
   document.getElementById("f-name").value="";
   document.getElementById("f-msg").value="";
-  clearGif();emoji=null;
+  clearGif();clearPhoto();emoji=null;
   emojiToggleLabel.textContent="Pick an emoji";
   emojiNone.classList.add("active");
   emojiContainer.style.display="none";
@@ -554,6 +646,30 @@ function modalClearGif(){
   document.getElementById("modal-gif-status").style.display="none";
 }
 
+function handleModalPhotoSelect(input){
+  const file=input.files[0];if(!file)return;
+  if(!["image/jpeg","image/png"].includes(file.type)){
+    const s=document.getElementById("modal-photo-status");s.textContent="Please select a JPEG or PNG file.";s.style.display="block";return;
+  }
+  if(file.size>10*1024*1024){
+    const s=document.getElementById("modal-photo-status");s.textContent="File too large (max 10 MB).";s.style.display="block";return;
+  }
+  document.getElementById("modal-photo-status").style.display="none";
+  compressImage(file).then(blob=>{
+    editPhotoFile=blob;
+    editPhotoUrl=URL.createObjectURL(blob);
+    document.getElementById("modal-photo-preview-img").src=editPhotoUrl;
+    document.getElementById("modal-photo-selected").style.display="block";
+  });
+}
+function modalClearPhoto(){
+  editPhotoFile=null;editPhotoUrl=null;
+  document.getElementById("modal-photo-selected").style.display="none";
+  document.getElementById("modal-photo-preview-img").src="";
+  document.getElementById("modal-photo-input").value="";
+  document.getElementById("modal-photo-status").style.display="none";
+}
+
 function openModal(id){
   editingId=id;
   const c=cardsById[id];
@@ -574,21 +690,31 @@ function openModal(id){
     document.getElementById("modal-gif-selected").style.display="block";
     editGifUrl=c.gif_url;
   }
+  editPhotoFile=null;
+  editPhotoUrl=c.photo_url||null;
+  modalClearPhoto();
+  if(editPhotoUrl){
+    document.getElementById("modal-photo-preview-img").src=editPhotoUrl;
+    document.getElementById("modal-photo-selected").style.display="block";
+    editPhotoUrl=c.photo_url;
+  }
   document.getElementById("modal").classList.add("open");
 }
 function closeModal(){
   editingId=null;
-  editEmoji=null;editGifUrl=null;
+  editEmoji=null;editGifUrl=null;editPhotoFile=null;editPhotoUrl=null;
   modalEmojiLabel.textContent="No emoji";
   modalEmojiNone.classList.add("active");
   modalEmojiContainer.style.display="none";
-  modalClearGif();
+  modalClearGif();modalClearPhoto();
   document.getElementById("modal").classList.remove("open");
 }
 async function saveEdit(){
   const msg=document.getElementById("modal-msg").value.trim();
   if(!msg)return;
-  const{error}=await sb.from(CONFIG.TABLE).update({message:msg,emoji:editEmoji||null,gif_url:editGifUrl||null}).eq("id",editingId);
+  let photoUrl=editPhotoUrl;
+  if(editPhotoFile){photoUrl=await uploadPhoto(editPhotoFile);if(!photoUrl){alert("Photo upload failed.");return;}}
+  const{error}=await sb.from(CONFIG.TABLE).update({message:msg,emoji:editEmoji||null,gif_url:editGifUrl||null,photo_url:photoUrl||null}).eq("id",editingId);
   if(error){console.error(error);alert("Could not save — please try again.");return;}
   closeModal();
   loadBoard();
@@ -639,6 +765,7 @@ function cardHtml(c,delay=0){
   ${c.emoji?`<div class="card-emoji">${c.emoji}</div>`:""}
   <div class="card-body">${esc(c.message)}</div>
   ${c.gif_url?`<div class="card-gif"><img src="${esc(c.gif_url)}" alt="GIF" loading="lazy"/></div>`:""}
+  ${c.photo_url?`<div class="card-photo"><img src="${esc(c.photo_url)}" alt="Photo" loading="lazy"/></div>`:""}
   ${actions}
 </div>`;
 }
