@@ -523,7 +523,7 @@ function cardHtml(c,delay=0){
   const a=ACCENTS[c.accent_idx]||ACCENTS[0];
   const mine=!IS_RECIPIENT&&isMyCard(c.id);
   const actions=mine?`<div class="card-actions">
-    <button class="card-btn edit" onclick="openModal('${c.id}',${JSON.stringify(c.message)})">✏️ Edit</button>
+    <button class="card-btn edit" onclick="openModal('${c.id}',${JSON.stringify(c.message).replace(/&/g,'&amp;').replace(/"/g,'&quot;')})">✏️ Edit</button>
     <button class="card-btn del" onclick="deleteCard('${c.id}')">🗑 Delete</button>
   </div>`:"";
   return`<div class="card" style="--c-accent:${a.hex};--c-tint:${a.tint};animation-delay:${delay}s">
