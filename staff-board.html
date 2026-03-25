@@ -6,6 +6,7 @@
 <title>Thank You, Obama Foundation Staff</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,700;0,9..144,900;1,9..144,400&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<script type="module" src="https://cdn.jsdelivr.net/npm/emoji-picker-element@^1/index.js"></script>
 
 <!--
   ╔═══════════════════════════════════════════════════════╗
@@ -79,10 +80,18 @@ body{font-family:'DM Sans',system-ui,sans-serif;background:var(--paper);color:va
 .swatch{width:26px;height:26px;border-radius:7px;border:2.5px solid transparent;cursor:pointer;transition:transform .14s,border-color .14s;flex-shrink:0}
 .swatch:hover{transform:scale(1.18)}
 .swatch.active{border-color:var(--ink)!important;transform:scale(1.12)}
-.emoji-row{display:flex;gap:4px;flex-wrap:wrap}
-.emo{font-size:19px;padding:3px 5px;border-radius:7px;border:1.5px solid transparent;cursor:pointer;transition:background .1s,border-color .1s;line-height:1}
-.emo:hover{background:var(--paper)}
-.emo.active{border-color:var(--cobalt-mid);background:var(--cobalt-pale)}
+/* Emoji picker */
+.emoji-picker-wrap{position:relative}
+.emoji-selected-row{display:flex;align-items:center;gap:8px}
+.emoji-toggle{display:flex;align-items:center;gap:8px;padding:7px 14px;border-radius:9px;border:1.5px solid var(--border2);background:var(--paper);font-family:'DM Sans',sans-serif;font-size:13px;color:var(--ink);cursor:pointer;transition:border-color .18s,background .15s}
+.emoji-toggle:hover,.emoji-toggle:focus{border-color:var(--cobalt);background:var(--white);outline:none}
+.emoji-toggle .chosen-emoji{font-size:22px;line-height:1}
+.emoji-none-btn{font-size:13px;color:var(--muted);display:flex;align-items:center;justify-content:center;width:28px;height:28px;padding:3px 5px;border-radius:7px;border:1.5px solid transparent;cursor:pointer;transition:background .1s,border-color .1s;line-height:1;background:none}
+.emoji-none-btn:hover{background:var(--paper)}
+.emoji-none-btn.active{border-color:var(--cobalt-mid);background:var(--cobalt-pale)}
+.emoji-picker-container{margin-top:8px;border-radius:12px;overflow:hidden;border:1px solid var(--border);box-shadow:var(--shadow)}
+emoji-picker{--emoji-size:1.4rem;--background:var(--white);--border-color:var(--border);--indicator-color:var(--cobalt);--input-border-color:var(--border2);--input-font-color:var(--ink);--input-placeholder-color:var(--muted);--category-font-color:var(--muted);--num-columns:8;width:100%;height:280px;--input-border-radius:9px;--input-padding:0.4rem 0.6rem;font-family:'DM Sans',sans-serif}
+@media(max-width:540px){emoji-picker{--num-columns:6;height:250px;--emoji-size:1.3rem}}
 
 /* GIF */
 .gif-search-row{position:relative}
@@ -247,7 +256,17 @@ body{font-family:'DM Sans',system-ui,sans-serif;background:var(--paper);color:va
     </div>
     <div class="form-group">
       <label>Emoji (optional)</label>
-      <div class="emoji-row" id="emoji-row"></div>
+      <div class="emoji-picker-wrap" id="emoji-picker-wrap">
+        <div class="emoji-selected-row">
+          <button type="button" class="emoji-toggle" id="emoji-toggle">
+            <span id="emoji-toggle-label">Pick an emoji</span>
+          </button>
+          <button type="button" class="emoji-none-btn active" id="emoji-none">✕</button>
+        </div>
+        <div class="emoji-picker-container" id="emoji-picker-container" style="display:none">
+          <emoji-picker class="light" id="emoji-picker"></emoji-picker>
+        </div>
+      </div>
     </div>
     <div class="form-group">
       <label>Message</label>
@@ -302,7 +321,6 @@ const ACCENTS=[
   {hex:"#7c3aed",tint:"#faf5ff",av:"#7c3aed"},{hex:"#db2777",tint:"#fdf2f8",av:"#db2777"},
   {hex:"#0891b2",tint:"#ecfeff",av:"#0891b2"},{hex:"#d97706",tint:"#fffbeb",av:"#d97706"},
 ];
-const EMOJIS=["🙏","💙","🌟","🎉","🌸","✨","🔥","💫","🤗","🥹","💯","🌈","🫶","👏"];
 
 let accent=ACCENTS[0], emoji=null, gifUrl=null;
 let editingId=null;
@@ -332,21 +350,29 @@ ACCENTS.forEach((a,i)=>{
   sw.appendChild(el);
 });
 
-// Build emoji row
-const er=document.getElementById("emoji-row");
-// "None" button so users can explicitly skip emoji
-const noneBtn=document.createElement("span");
-noneBtn.className="emo active";
-noneBtn.textContent="✕";
-noneBtn.style.cssText="font-size:13px;color:var(--muted);display:flex;align-items:center;justify-content:center;width:28px;height:28px";
-noneBtn.onclick=()=>{emoji=null;er.querySelectorAll(".emo").forEach(x=>x.classList.remove("active"));noneBtn.classList.add("active");syncPreview();};
-er.appendChild(noneBtn);
-EMOJIS.forEach((e,i)=>{
-  const el=document.createElement("span");
-  el.className="emo";
-  el.textContent=e;
-  el.onclick=()=>{emoji=e;er.querySelectorAll(".emo").forEach(x=>x.classList.remove("active"));el.classList.add("active");syncPreview();};
-  er.appendChild(el);
+// ── Emoji picker ──
+const emojiToggle=document.getElementById("emoji-toggle");
+const emojiToggleLabel=document.getElementById("emoji-toggle-label");
+const emojiContainer=document.getElementById("emoji-picker-container");
+const emojiPicker=document.getElementById("emoji-picker");
+const emojiNone=document.getElementById("emoji-none");
+
+emojiToggle.addEventListener("click",()=>{
+  const open=emojiContainer.style.display!=="none";
+  emojiContainer.style.display=open?"none":"block";
+});
+emojiPicker.addEventListener("emoji-click",(e)=>{
+  emoji=e.detail.unicode;
+  emojiToggleLabel.innerHTML='<span class="chosen-emoji">'+emoji+'</span> Change emoji';
+  emojiNone.classList.remove("active");
+  emojiContainer.style.display="none";
+  syncPreview();
+});
+emojiNone.addEventListener("click",()=>{
+  emoji=null;
+  emojiToggleLabel.textContent="Pick an emoji";
+  emojiNone.classList.add("active");
+  syncPreview();
 });
 
 // ── Live preview ──
@@ -435,7 +461,9 @@ async function submitCard(){
   document.getElementById("f-name").value="";
   document.getElementById("f-msg").value="";
   clearGif();emoji=null;
-  er.querySelectorAll(".emo").forEach(b=>b.classList.remove("active"));
+  emojiToggleLabel.textContent="Pick an emoji";
+  emojiNone.classList.add("active");
+  emojiContainer.style.display="none";
   syncPreview();
   setTimeout(()=>notice.textContent="",5000);
   btn.disabled=false;btn.textContent="Post My Card →";
