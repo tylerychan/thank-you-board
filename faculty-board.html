@@ -221,7 +221,7 @@ emoji-picker{--emoji-size:1.4rem;--background:var(--white);--border-color:var(--
     <div class="hero-pill">
       <span class="hero-pill-num" id="hero-count">–</span>
       <span class="hero-pill-dot"></span>
-      <span>cards written just for you</span>
+      <span>cards written</span>
     </div>
   </div>
 </div>
@@ -408,7 +408,7 @@ async function searchGifs(){
     status.textContent="Add your GIPHY API key in CONFIG to enable GIF search.";return;
   }
   try{
-    const res=await fetch(`https://api.giphy.com/v1/gifs/search?q=${encodeURIComponent(q)}&api_key=${CONFIG.GIPHY_KEY}&limit=8&rating=g`);
+    const res=await fetch(`https://api.giphy.com/v1/gifs/search?q=${encodeURIComponent(q)}&api_key=${CONFIG.GIPHY_KEY}&limit=50&rating=g`);
     const data=await res.json();
     status.style.display="none";
     if(!data.data?.length){status.textContent="No results found.";status.style.display="block";return;}
